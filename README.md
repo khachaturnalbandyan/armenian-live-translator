@@ -55,7 +55,7 @@ offline.
 ./run.sh --input mic.wav --input-system call.wav   # replay both streams
 ```
 
-Useful flags: `--stats` (timing per line), `--speaker-threshold` (how similar two
+Useful flags: `--stats` (timing per line), `--output <file>` (save transcript lines to a text file), `--speaker-threshold` (how similar two
 segments must sound to be the same person, default 0.55; raise it if one person is
 split into two labels, lower it if two people get merged), `--diarize` (split speakers
 on the microphone stream too), `--min-silence-ms`, `--max-segment-s`, `--threshold`
