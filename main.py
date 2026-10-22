@@ -64,7 +64,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     )
     parser.add_argument("--no-translate", action="store_true", help="transcribe only (debugging)")
     parser.add_argument(
-        "--min-silence-ms", type=int, default=350, help="pause that ends a segment (default: 350)"
+        "--min-silence-ms", type=int, default=450, help="pause that ends a segment (default: 450)"
     )
     parser.add_argument(
         "--max-segment-s", type=float, default=6.0, help="hard cut for long monologues (default: 6.0)"
