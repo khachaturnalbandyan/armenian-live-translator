@@ -1,0 +1,32 @@
+[
+  {
+    "file": "tts_01.wav",
+    "reference": "Բարև, ինչպես ես։",
+    "seconds": 2.21,
+    "source": "piper hy_AM-gor-medium"
+  },
+  {
+    "file": "tts_02.wav",
+    "reference": "Լավ եմ, շնորհիվ աստծո։",
+    "seconds": 2.72,
+    "source": "piper hy_AM-gor-medium"
+  },
+  {
+    "file": "tts_03.wav",
+    "reference": "Այսօր եղանակը շատ լավ է, արի գնանք զբոսնելու։",
+    "seconds": 4.09,
+    "source": "piper hy_AM-gor-medium"
+  },
+  {
+    "file": "tts_04.wav",
+    "reference": "Ժողովը սկսվում է ժամը երեքին, մի ուշացիր։",
+    "seconds": 3.86,
+    "source": "piper hy_AM-gor-medium"
+  },
+  {
+    "file": "tts_05.wav",
+    "reference": "Ես կարծում եմ, որ այս լուծումը ավելի արագ կաշխատի։",
+    "seconds": 3.91,
+    "source": "piper hy_AM-gor-medium"
+  }
+]

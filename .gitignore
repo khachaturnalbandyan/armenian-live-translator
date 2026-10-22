@@ -1,0 +1,16 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.freebuff/
+
+# Model weights and audio recordings are not committed (see the brief).
+eval/voices/
+eval/audio/
+recordings/
+*.wav
+*.onnx
+*.bin
+*.safetensors
+*.pt
+

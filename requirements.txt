@@ -1,0 +1,15 @@
+faster-whisper==1.2.1
+transformers>=4.46
+numpy>=1.24
+# Torch pins its own audio companion to the exact same version, and torchaudio's last
+# release is 2.11, so 2.11 is the version both are held at.
+torch>=2.8,<2.12
+torchaudio>=2.8,<2.12
+# Speaker embeddings (pyannote 4 API). Its diarization pipelines are gated, but the
+# WeSpeaker embedding model we use is not, so no Hugging Face token is needed.
+pyannote.audio==4.0.7
+# CTranslate2 (used by faster-whisper) is built against CUDA 12, while recent PyTorch
+# wheels bundle CUDA 13. These provide the cuBLAS/cuDNN libraries it loads at runtime;
+# run.sh puts them on LD_LIBRARY_PATH.
+nvidia-cublas-cu12
+nvidia-cudnn-cu12
