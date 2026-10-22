@@ -34,11 +34,11 @@ class Segmenter:
         self,
         sample_rate: int = 16_000,
         threshold: float = 0.5,
-        min_silence_ms: int = 350,
-        min_speech_ms: int = 200,
+        min_silence_ms: int = 500,
+        min_speech_ms: int = 350,
         max_segment_s: float = 6.0,
-        pad_ms: int = 200,
-        pre_roll_ms: int = 160,
+        pad_ms: int = 250,
+        pre_roll_ms: int = 200,
     ):
         self.sample_rate = sample_rate
         self.threshold = threshold
