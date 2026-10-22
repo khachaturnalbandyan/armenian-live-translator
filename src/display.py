@@ -11,9 +11,12 @@ SPEAKER_COLORS = ["\033[36m", "\033[33m", "\033[35m", "\033[32m", "\033[34m", "\
 
 
 class Printer:
-    def __init__(self, stream=sys.stdout, color: bool | None = None):
+    def __init__(
+        self, stream=sys.stdout, color: bool | None = None, output_file: str | None = None
+    ):
         self.stream = stream
         self.color = stream.isatty() if color is None else color
+        self.output_file = output_file
         self._colors: dict[str, str] = {}
 
     def _paint(self, text: str, code: str) -> str:
@@ -36,9 +39,20 @@ class Printer:
         clock = timestamp - started_at
         hh, rem = divmod(int(clock), 3600)
         mm, ss = divmod(rem, 60)
-        stamp = self._paint(f"[{hh:02d}:{mm:02d}:{ss:02d}]", DIM)
-        who = self._paint(f"{speaker:<9}", self.speaker_color(speaker))
-        line = f"{stamp} {who} HY: {self._paint(armenian, BOLD)}  EN: {english}"
+        stamp_raw = f"[{hh:02d}:{mm:02d}:{ss:02d}]"
+        who_raw = f"{speaker:<9}"
+
+        line = f"{self._paint(stamp_raw, DIM)} {self._paint(who_raw, self.speaker_color(speaker))} HY: {self._paint(armenian, BOLD)}  EN: {english}"
         if stats:
             line += f"  {self._paint(stats, DIM)}"
         print(line, file=self.stream, flush=True)
+
+        if self.output_file:
+            plain_line = f"{stamp_raw} {who_raw} HY: {armenian}  EN: {english}"
+            if stats:
+                plain_line += f"  {stats}"
+            try:
+                with open(self.output_file, "a", encoding="utf-8") as f:
+                    f.write(plain_line + "\n")
+            except OSError as exc:
+                print(f"! failed to write output file: {exc}", file=sys.stderr)

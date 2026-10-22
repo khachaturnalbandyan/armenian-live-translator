@@ -71,6 +71,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     )
     parser.add_argument("--threshold", type=float, default=0.5, help="VAD speech threshold")
     parser.add_argument("--stats", action="store_true", help="print timing next to each line")
+    parser.add_argument("--output", help="optional file path to save live transcripts")
     return parser.parse_args(argv)
 
 
@@ -190,7 +191,7 @@ def main(argv: list[str] | None = None) -> int:
         sources=sources,
         transcriber=transcriber,
         translator=translator,
-        printer=Printer(),
+        printer=Printer(output_file=args.output),
         identifier=identifier,
         show_stats=args.stats,
     )
