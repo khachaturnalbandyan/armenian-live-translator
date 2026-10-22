@@ -64,14 +64,18 @@ def pct(values: list[float], q: float) -> float:
 
 
 def evaluate(model_name: str, mode: str, translate: bool, compute_type: str) -> dict:
-    references = {m["file"]: m["reference"] for m in json.loads(MANIFEST.read_text("utf-8"))}
+    manifest = json.loads(MANIFEST.read_text("utf-8"))
+    references = {m["file"]: m["reference"] for m in manifest}
     transcriber = Transcriber(model_name=model_name, device="cuda", compute_type=compute_type)
     translator = Translator(device="cuda") if translate else None
 
     errors, latencies = [], []
-    for path in sorted(glob.glob(str(AUDIO_DIR / "*.wav"))):
-        audio = load_wav(path)
-        name = Path(path).name
+    for entry in manifest:
+        path = AUDIO_DIR / entry["file"]
+        if not path.is_file():
+            continue
+        audio = load_wav(str(path))
+        name = entry["file"]
 
         if mode == "file":
             pieces = [(audio, 0.0)]
