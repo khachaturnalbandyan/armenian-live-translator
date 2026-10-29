@@ -88,3 +88,4 @@ for speaker embeddings, which describe the voice rather than the language.
 | R5 | A failing segment does not kill the session | ✅ (logged, session continues) |
 | R6 | Long monologue is cut at 6 s and still transcribed | ⏳ |
 | R7 | Fully offline after first download (no network calls while running) | ⏳ verify before interview |
+| R8 | Word loops ("այդ այդ այդ ...") are retried, and shown as `[unclear]` if they persist | ✅ 5 unit tests in `tests/test_asr_loop.py`; both loops in the `two_voices.wav` replay fixed by the retry (+0.5-0.9 s), eval CER unchanged at 13.5% |

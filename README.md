@@ -95,6 +95,10 @@ Details and the alternatives that were rejected are in [DECISIONS.md](DECISIONS.
   `--stats` numbers show for a single stream.
 - No echo handling: if the call audio plays through speakers, the microphone will pick
   it up twice (the brief puts echo handling out of scope; use headphones).
+- Whisper sometimes gets stuck repeating one word ("այդ այդ այդ ..."). Such a segment is
+  decoded once more with repeats blocked (about +1 s); if it still loops it is shown as
+  `[unclear]` rather than translated. Blocking repeats on every segment would avoid the
+  retry but raised CER from 13.5% to 16.0%, so it is used only after a loop.
 - Long monologues are hard-cut at 6 s, which can split a sentence mid-word.
 - Linux/PipeWire only for live capture; macOS would need a different capture backend
   (`capture.py` is the single place to change).

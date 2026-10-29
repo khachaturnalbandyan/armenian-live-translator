@@ -56,6 +56,8 @@ class Pipeline:
         self._started_at = time.monotonic()
         self._latencies: list[float] = []
         self._failures = 0
+        self._retries = 0
+        self._unclear = 0
         self._counts: dict[str, int] = {}
 
     def run(self) -> None:
@@ -133,9 +135,16 @@ class Pipeline:
         transcript = self.transcriber.transcribe(segment.audio)
         if not transcript.text:
             return
+        self._retries += transcript.retried
+        self._unclear += transcript.unclear
 
+        armenian = transcript.text
         english, translate_time = "", 0.0
-        if self.translator is not None:
+        if transcript.unclear:
+            # A looped transcript translates into "this this this ..."; say it is
+            # unusable instead of presenting it as what was said.
+            armenian, english = f"[unclear] {transcript.text}", "[unclear]"
+        elif self.translator is not None:
             english, translate_time = self.translator.translate(transcript.text)
 
         latency = time.monotonic() - segment.t_finalized
@@ -145,15 +154,16 @@ class Pipeline:
         stats = ""
         if self.show_stats:
             speaker_part = f"spk {speaker_time:.2f}s, " if source.speaker is None else ""
+            retry_part = " incl. loop retry" if transcript.retried else ""
             stats = (
-                f"({speaker_part}asr {transcript.elapsed:.2f}s + mt {translate_time:.2f}s, "
+                f"({speaker_part}asr {transcript.elapsed:.2f}s{retry_part} + mt {translate_time:.2f}s, "
                 f"latency {latency:.2f}s)"
             )
         self.printer.segment(
             started_at=self._started_at,
             timestamp=self._started_at + segment.start,
             speaker=speaker,
-            armenian=transcript.text,
+            armenian=armenian,
             english=english,
             stats=stats,
         )
@@ -171,6 +181,7 @@ class Pipeline:
         print(
             f"\n{len(lat)} segments · latency p50 {p50:.2f}s, p95 {p95:.2f}s, "
             f"max {slowest:.2f}s · over 5s: {over} · by speaker: {by_speaker}"
+            + (f" · loops retried: {self._retries}, unclear: {self._unclear}" if self._retries else "")
             + (f" · failures: {self._failures}" if self._failures else ""),
             flush=True,
         )
