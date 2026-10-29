@@ -72,8 +72,8 @@ def main() -> None:
             capture_output=True, text=True, check=True,
         ).stdout.strip()
         manifest.append(
-            {"file": name, "reference": sentence, "seconds": round(float(duration), 2),
-             "source": "piper hy_AM-gor-medium"}
+            {"file": f"audio/{name}", "reference": sentence, "seconds": round(float(duration), 2),
+             "source": "piper hy_AM-gor-medium", "speaker": "piper-gor"}
         )
         print(f"{name}: {float(duration):.1f}s - {sentence}")
 

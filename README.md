@@ -106,5 +106,23 @@ Details and the alternatives that were rejected are in [DECISIONS.md](DECISIONS.
 python tools/build_eval_audio.py            # synthetic Armenian eval set (needs piper-tts)
 python tools/eval_offline.py --translate    # CER + latency of the real components
 python tools/build_diarization_test.py      # two-voice clip for speaker identification
-.venv/bin/python -m pytest tests/ -q        # clustering logic, model-free, ~1 s
+.venv/bin/python -m pytest tests/ -q        # clustering + scoring logic, model-free, ~1 s
 ```
+
+### Comparing speech recognisers on real recordings
+
+```bash
+python tools/record_eval.py --speaker aram                 # read 20 Armenian sentences into the mic
+python tools/record_eval.py --speaker ani --device <sink>.monitor --source call   # call side
+python tools/compare_asr.py faster-whisper:large-v3 faster-whisper:large-v3-turbo \
+    mms:facebook/mms-1b-all seamless:facebook/seamless-m4t-v2-large \
+    --show --report eval/results.md
+```
+
+`record_eval.py` saves 16 kHz WAVs to `eval/real/` (git-ignored) and the correct text
+to `eval/real/manifest.json`. `compare_asr.py` loads one model at a time and reports
+CER, WER and recognition time, broken down by speaker and by source (mic vs call);
+`--segment` cuts audio with the live segmenter first, `--manifest eval/manifest.json`
+uses the synthetic set. Backends: `faster-whisper:<name>`, `hf-whisper:<repo>` (any
+Whisper fine-tune), `mms:<repo>`, `seamless:<repo>` (see `tools/asr_backends.py`).
+CER ignores punctuation and case, and treats `և` and `եւ` as the same.

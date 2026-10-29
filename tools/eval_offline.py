@@ -12,15 +12,10 @@ Usage:
 from __future__ import annotations
 
 import argparse
-import glob
-import json
 import statistics
 import sys
 import time
-import wave
 from pathlib import Path
-
-import numpy as np
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
@@ -28,54 +23,19 @@ sys.path.insert(0, str(ROOT))
 from src.asr import Transcriber  # noqa: E402
 from src.segmenter import Segmenter  # noqa: E402
 from src.translate import Translator  # noqa: E402
-AUDIO_DIR = ROOT / "eval" / "audio"
+from tools.scoring import cer, load_manifest, load_wav, percentile  # noqa: E402
+
 MANIFEST = ROOT / "eval" / "manifest.json"
 
 
-def load_wav(path: str) -> np.ndarray:
-    with wave.open(path, "rb") as wav:
-        assert wav.getframerate() == 16_000, f"{path}: expected 16 kHz"
-        raw = wav.readframes(wav.getnframes())
-    return np.frombuffer(raw, dtype=np.int16).astype(np.float32) / 32768.0
-
-
-def normalize(text: str) -> str:
-    return "".join(ch for ch in text.lower() if ch.isalnum() or "\u0530" <= ch <= "\u058f")
-
-
-def cer(reference: str, hypothesis: str) -> float:
-    ref, hyp = normalize(reference), normalize(hypothesis)
-    if not ref:
-        return 0.0 if not hyp else 1.0
-    prev = list(range(len(hyp) + 1))
-    for i, rc in enumerate(ref, start=1):
-        cur = [i]
-        for j, hc in enumerate(hyp, start=1):
-            cur.append(min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (rc != hc)))
-        prev = cur
-    return prev[-1] / len(ref)
-
-
-def pct(values: list[float], q: float) -> float:
-    if not values:
-        return 0.0
-    ordered = sorted(values)
-    return ordered[min(len(ordered) - 1, int(len(ordered) * q))]
-
-
 def evaluate(model_name: str, mode: str, translate: bool, compute_type: str) -> dict:
-    manifest = json.loads(MANIFEST.read_text("utf-8"))
-    references = {m["file"]: m["reference"] for m in manifest}
+    items = load_manifest(MANIFEST)
     transcriber = Transcriber(model_name=model_name, device="cuda", compute_type=compute_type)
     translator = Translator(device="cuda") if translate else None
 
     errors, latencies = [], []
-    for entry in manifest:
-        path = AUDIO_DIR / entry["file"]
-        if not path.is_file():
-            continue
-        audio = load_wav(str(path))
-        name = entry["file"]
+    for item in items:
+        audio = load_wav(item.path)
 
         if mode == "file":
             pieces = [(audio, 0.0)]
@@ -92,14 +52,14 @@ def evaluate(model_name: str, mode: str, translate: bool, compute_type: str) -> 
             latencies.append(time.monotonic() - started)
             texts.append(transcript.text)
 
-        errors.append(cer(references[name], " ".join(texts)))
+        errors.append(cer(item.reference, " ".join(texts)))
 
     return {
         "model": model_name,
         "mode": mode,
         "cer": statistics.mean(errors) * 100,
-        "p50": pct(latencies, 0.50),
-        "p95": pct(latencies, 0.95),
+        "p50": percentile(latencies, 0.50),
+        "p95": percentile(latencies, 0.95),
     }
 
 
