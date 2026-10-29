@@ -44,7 +44,8 @@ class Transcriber:
             language=self.language,
             beam_size=self.beam_size,
             no_speech_threshold=0.6,
-            repetition_penalty=1.1,
+            # No repetition_penalty: 1.1 raised CER from 13.5% to 17.7% on the eval set,
+            # because Armenian legitimately repeats the same tokens.
             condition_on_previous_text=False,
             without_timestamps=True,
         )

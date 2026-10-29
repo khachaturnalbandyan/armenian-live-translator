@@ -46,6 +46,13 @@ Current numbers (5 synthetic phrases, RTX 4060, float16):
 Run `tools/eval_offline.py --modes stream` after changing segmentation; it feeds the
 output of the real `Segmenter` into the recogniser.
 
+**Rule:** any change to decoding settings is measured before it is committed. The
+`repetition_penalty=1.1` added in 8fed087 raised CER from 13.5% to 17.7% on this set and
+was removed after measuring each setting separately.
+
+Real recordings: `tools/record_eval.py` + `tools/compare_asr.py` (see README,
+"Comparing speech recognisers"). ⏳ no real recordings yet.
+
 ### Speaker identification
 
 ```bash
