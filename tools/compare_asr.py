@@ -183,13 +183,27 @@ def main() -> int:
         print("error: the manifest has no recordings", file=sys.stderr)
         return 1
 
-    results = [run_backend(spec, items, args.segment) for spec in args.backends]
+    results, failures = [], []
+    for spec in args.backends:
+        # One model failing to load must not throw away the others' results,
+        # but it is reported in the output, never skipped quietly.
+        try:
+            results.append(run_backend(spec, items, args.segment))
+        except Exception as exc:
+            print(f"!! {spec} failed: {exc.__class__.__name__}: {exc}", file=sys.stderr, flush=True)
+            failures.append(f"- `{spec}` failed: {exc.__class__.__name__}: {exc}")
+    if not results:
+        print("error: every backend failed", file=sys.stderr)
+        return 1
+
     report = build_report(results, manifests, args.segment, args.show)
+    if failures:
+        report += "\n\nFailed backends:\n\n" + "\n".join(failures)
     print("\n" + report)
     if args.report:
         args.report.write_text(report + "\n", encoding="utf-8")
         print(f"\nwrote {args.report}")
-    return 0
+    return 1 if failures else 0
 
 
 if __name__ == "__main__":
