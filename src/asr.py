@@ -8,6 +8,16 @@ from dataclasses import dataclass
 import numpy as np
 from faster_whisper import WhisperModel
 
+# Whisper large-v3-turbo fine-tuned on Armenian, already converted for faster-whisper.
+# On the synthetic eval set: CER 6.0% vs 13.5% for stock large-v3, 7.9% vs 18.7% on
+# speech sped up 1.6x, and about twice as fast. See DECISIONS.md (D1).
+DEFAULT_MODEL = "hurricup/whisper-large-v3-turbo-armenian-ct2"
+
+# The Armenian fine-tune writes subtitle-style dialogue marks: a leading "- " and "…"
+# in place of a sentence end. Neither is speech, and both end up in the translation.
+DIALOGUE_DASH = "-–—"
+ELLIPSIS = "…"
+
 # Whisper sometimes gets stuck repeating one word ("այդ այդ այդ այդ ..."). The same
 # word this many times in a row is treated as such a loop.
 LOOP_RUN = 3
@@ -32,11 +42,17 @@ def has_word_loop(text: str, run: int = LOOP_RUN) -> bool:
     return any(len(set(words[i : i + run])) == 1 for i in range(len(words) - run + 1))
 
 
+def clean_text(text: str) -> str:
+    """Drop the subtitle marks: a leading dialogue dash and every "…"."""
+    text = text.replace(ELLIPSIS, " ")
+    text = text.strip().lstrip(DIALOGUE_DASH).strip()
+    return " ".join(text.split())
+
 
 class Transcriber:
     def __init__(
         self,
-        model_name: str = "large-v3",
+        model_name: str = DEFAULT_MODEL,
         device: str = "cuda",
         compute_type: str = "float16",
         language: str = "hy",
@@ -86,4 +102,4 @@ class Transcriber:
         )
         # faster-whisper returns a lazy generator: all the work happens here, so the
         # timer in transcribe() has to wrap the consumption of it, not the call above.
-        return " ".join(seg.text.strip() for seg in segments).strip()
+        return " ".join(clean_text(seg.text) for seg in segments).strip()

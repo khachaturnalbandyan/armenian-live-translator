@@ -4,7 +4,32 @@ Short log of choices that were not obvious, with the reason they were made.
 Numbers come from `tools/eval_offline.py` on the synthetic Armenian set in `eval/audio`
 (5 phrases, Piper `hy_AM-gor-medium`), CUDA float16 on an RTX 4060 Laptop.
 
-## D1 - Speech recognition: faster-whisper `large-v3`
+## D1 - Speech recognition: Armenian fine-tune of Whisper large-v3-turbo
+
+Updated 2026-10-30. The default is now `hurricup/whisper-large-v3-turbo-armenian-ct2`
+(Apache-2.0, already in CTranslate2 format, so it runs in the same faster-whisper code).
+Measured with `tools/compare_asr.py`; full output in `eval/results-synthetic.md`.
+
+| model | CER | WER | s / phrase | CER 1.0x / 1.3x / 1.6x, continuous |
+| --- | --- | --- | --- | --- |
+| `hurricup/whisper-large-v3-turbo-armenian-ct2` | 6.0% | 24.0% | 0.33 | 5.8% / 7.9% / **7.9%** |
+| `ErikMkrtchyan/w2v-bert-2.0-armenian-CV20.0` (CTC) | **4.9%** | 21.1% | 0.05 | 3.6% / 6.5% / 17.3% |
+| `facebook/mms-1b-all` (CTC) | 6.9% | 45.2% | 0.07 | 7.9% / 9.4% / 10.1% |
+| `large-v3` (previous default) | 13.5% | 45.4% | 0.82 | 10.8% / 15.8% / 18.7% |
+
+Why the Armenian turbo: half the CER of `large-v3`, it barely degrades on fast speech
+(the user's main complaint), it keeps punctuation and word boundaries (NLLB needs them),
+and it is about twice as fast. w2v-BERT has the lowest CER on normal speech, but it
+collapses at 1.6x, joins words and has no punctuation. `arampacha/whisper-large-hy-2`
+could not be run (its generation config is too old for current transformers).
+
+The fine-tune writes subtitle marks ("- " at the start, "…" for a sentence end);
+`src/asr.py:clean_text` removes them before translation.
+
+Caveat: the same 5 synthetic phrases, one voice. Confirm on real recordings
+(`tools/record_eval.py`) before the interview; `--model large-v3` restores the old model.
+
+### Original choice: `large-v3`
 
 Measured, transcription only plus NLLB:
 

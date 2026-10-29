@@ -11,7 +11,7 @@ import sys
 os.environ.setdefault("HF_HUB_DISABLE_PROGRESS_BARS", "1")
 os.environ.setdefault("TRANSFORMERS_VERBOSITY", "error")
 
-from src.asr import Transcriber
+from src.asr import DEFAULT_MODEL, Transcriber
 from src.capture import (
     CaptureError,
     ParecCapture,
@@ -56,7 +56,9 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=0.55,
         help="cosine similarity above which a segment belongs to a known speaker (default: 0.55)",
     )
-    parser.add_argument("--model", default="large-v3", help="faster-whisper model (default: large-v3)")
+    parser.add_argument(
+        "--model", default=DEFAULT_MODEL, help=f"faster-whisper model (default: {DEFAULT_MODEL})"
+    )
     parser.add_argument("--compute-type", default="float16", help="CTranslate2 compute type")
     parser.add_argument("--cpu", action="store_true", help="run on CPU instead of CUDA")
     parser.add_argument(

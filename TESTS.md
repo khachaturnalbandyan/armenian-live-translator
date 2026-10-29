@@ -33,7 +33,7 @@ the VAD cut, and the session ends with p50/p95/max and the count of segments ove
 
 ```bash
 python tools/build_eval_audio.py     # rebuild the synthetic set (needs piper-tts)
-python tools/eval_offline.py --models large-v3 --translate
+python tools/eval_offline.py --models hurricup/whisper-large-v3-turbo-armenian-ct2 --translate
 ```
 
 Current numbers (5 synthetic phrases, RTX 4060, float16):
@@ -42,6 +42,9 @@ Current numbers (5 synthetic phrases, RTX 4060, float16):
 | --- | --- | --- |
 | large-v3 | 13.2% | 0.90 s |
 | large-v3-turbo | 19.5% | 0.42 s |
+
+Since 2026-10-30 the default is `hurricup/whisper-large-v3-turbo-armenian-ct2`: 6.0% CER on the same set
+(`tools/compare_asr.py`, full table in `eval/results-synthetic.md`).
 
 Run `tools/eval_offline.py --modes stream` after changing segmentation; it feeds the
 output of the real `Segmenter` into the recogniser.

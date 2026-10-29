@@ -18,7 +18,7 @@ checked with real speech.
 
 ```
 microphone ─┐                    ┌── Silero VAD ──> phrases ──> speaker ID ──> faster-whisper ──> NLLB ──> terminal
-            ├─ 16 kHz mono ──────┤                                  (embeddings)     (large-v3)      (hy→en)
+            ├─ 16 kHz mono ──────┤                                  (embeddings)  (Armenian turbo)   (hy→en)
 system out ─┘                    └── each source has its own VAD and capture thread
 ```
 
@@ -39,8 +39,8 @@ python3 -m venv --system-site-packages .venv
 ```
 
 `--system-site-packages` reuses an existing PyTorch install; without it, `pip` pulls in
-its own torch wheel (a few GB). First run downloads the models: whisper `large-v3`
-(~3 GB) and NLLB-200 600M (~2.4 GB). They are cached afterwards and the program works
+its own torch wheel (a few GB). First run downloads the models: the Armenian Whisper
+turbo (~1.6 GB) and NLLB-200 600M (~2.4 GB). They are cached afterwards and the program works
 offline.
 
 ## Running
@@ -76,7 +76,7 @@ driver (BlackHole, Soundflower) is needed on Linux.
 
 | Stage | Choice | Why |
 | --- | --- | --- |
-| ASR | faster-whisper `large-v3`, CUDA float16 | Best measured Armenian quality of the local options; 13.2% CER vs 19.5% for `large-v3-turbo`, at 0.9 s per phrase — far inside the 5 s budget |
+| ASR | faster-whisper `hurricup/whisper-large-v3-turbo-armenian-ct2` (Whisper large-v3-turbo fine-tuned on Armenian), CUDA float16 | Best of five local recognisers measured: 6.0% CER vs 13.5% for stock `large-v3`, 7.9% vs 18.7% on speech sped up 1.6x, 0.33 s per phrase. Stock `large-v3` is still available with `--model large-v3` (see `DECISIONS.md`, D1) |
 | Translation | NLLB-200 distilled 600M, greedy | Trained on Armenian→English directly, 0.1–0.45 s per phrase |
 | VAD | Silero (bundled with faster-whisper) | Reliable on short phrases, cheap on CPU |
 | Speaker ID | pyannote `wespeaker-voxceleb-resnet34-LM` embeddings + online clustering | The embedding model behind the pyannote 3.1 pipeline, run per segment and clustered as the call goes on: 0.03–0.07 s per segment on CPU, no GPU contention, and it works streaming, which the offline 3.1 pipeline cannot. The embedding model is not gated, so no Hugging Face token is needed |
@@ -102,7 +102,7 @@ Details and the alternatives that were rejected are in [DECISIONS.md](DECISIONS.
 - Long monologues are hard-cut at 6 s, which can split a sentence mid-word.
 - Linux/PipeWire only for live capture; macOS would need a different capture backend
   (`capture.py` is the single place to change).
-- The 5 s budget assumes a CUDA GPU; on CPU `large-v3` will exceed it.
+- The 5 s budget assumes a CUDA GPU; on CPU the recogniser will exceed it.
 
 ## Development
 

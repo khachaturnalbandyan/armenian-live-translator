@@ -5,6 +5,7 @@ A backend is named "<kind>:<model>", for example:
     faster-whisper:large-v3                  the recogniser the live program uses
     hf-whisper:<hugging face repo>           any Whisper fine-tune in transformers format
     mms:facebook/mms-1b-all                  Meta MMS, CTC with the Armenian ("hye") adapter
+    ctc:<hugging face repo>                  any Armenian CTC fine-tune (wav2vec2, w2v-BERT)
     seamless:facebook/seamless-m4t-v2-large  Meta SeamlessM4T v2, speech -> Armenian text
 
 Every backend exposes `transcribe(audio) -> str` and `close()`. Models are loaded one at
@@ -109,6 +110,28 @@ class MmsBackend:
         del self._model
 
 
+class CtcBackend:
+    """Any CTC checkpoint already fine-tuned for Armenian, e.g. a wav2vec2 or w2v-BERT model."""
+
+    def __init__(self, model: str):
+        from transformers import AutoModelForCTC, AutoProcessor
+
+        self._device = _device()
+        self._processor = AutoProcessor.from_pretrained(model)
+        self._model = AutoModelForCTC.from_pretrained(model).to(self._device).eval()
+
+    def transcribe(self, audio: np.ndarray) -> str:
+        inputs = self._processor(audio, sampling_rate=SAMPLE_RATE, return_tensors="pt")
+        inputs = {name: value.to(self._device) for name, value in inputs.items()}
+        with torch.inference_mode():
+            logits = self._model(**inputs).logits
+        ids = torch.argmax(logits, dim=-1)[0]
+        return self._processor.decode(ids).strip()
+
+    def close(self) -> None:
+        del self._model
+
+
 class SeamlessBackend:
     """Meta SeamlessM4T v2, used here for Armenian speech -> Armenian text."""
 
@@ -144,6 +167,7 @@ BACKENDS = {
     "faster-whisper": FasterWhisperBackend,
     "hf-whisper": HfWhisperBackend,
     "mms": MmsBackend,
+    "ctc": CtcBackend,
     "seamless": SeamlessBackend,
 }
 
