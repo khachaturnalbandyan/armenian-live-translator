@@ -5,6 +5,7 @@ License: CC-BY-NC-4.0, non-commercial use only. See DECISIONS.md (D1).
 
 from __future__ import annotations
 
+import os
 import time
 
 import numpy as np
@@ -14,7 +15,21 @@ from src.asr import Transcript, has_word_loop
 
 SEAMLESS_MODEL = "facebook/seamless-m4t-v2-large"
 ARMENIAN = "hye"
+ARMENIAN_TOKEN = f"__{ARMENIAN}__"
 SAMPLE_RATE = 16_000
+
+
+def _local_snapshot(model_name: str) -> str:
+    """The cached snapshot folder if the model is downloaded, else the repo id.
+
+    Loaded by repo id, the tokenizer lists the repo's files online to find its
+    vocabulary; with the network off that fails quietly and leaves it nearly empty.
+    A local folder needs no listing, so the program works offline after the first run.
+    """
+    from huggingface_hub import try_to_load_from_cache
+
+    cached = try_to_load_from_cache(model_name, "tokenizer.model")
+    return os.path.dirname(cached) if isinstance(cached, str) else model_name
 
 
 class SeamlessTranscriber:
@@ -24,7 +39,11 @@ class SeamlessTranscriber:
         from transformers import AutoProcessor, SeamlessM4Tv2ForSpeechToText
 
         self._device = device
-        self._processor = AutoProcessor.from_pretrained(model_name)
+        self._processor = AutoProcessor.from_pretrained(_local_snapshot(model_name))
+        if ARMENIAN_TOKEN not in self._processor.tokenizer.get_vocab():
+            # Seen offline: the tokenizer loads with ~100 tokens and every transcript
+            # comes out empty, which looks like silence instead of an error.
+            raise RuntimeError(f"{model_name}: tokenizer has no {ARMENIAN_TOKEN} token")
         dtype = torch.float16 if device == "cuda" else torch.float32
         self._model = (
             SeamlessM4Tv2ForSpeechToText.from_pretrained(model_name, dtype=dtype).to(device).eval()

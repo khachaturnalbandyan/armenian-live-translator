@@ -31,3 +31,23 @@ def test_word_loop_is_marked_unclear():
 def test_empty_audio_is_not_decoded():
     transcript = make_transcriber("should not appear").transcribe(np.array([], dtype=np.float32))
     assert transcript.text == ""
+
+
+def test_loads_from_cached_snapshot_folder(monkeypatch):
+    import huggingface_hub
+
+    from src.asr_seamless import _local_snapshot
+
+    monkeypatch.setattr(
+        huggingface_hub, "try_to_load_from_cache", lambda repo, name: f"/cache/{repo}/snap/{name}"
+    )
+    assert _local_snapshot("facebook/x") == "/cache/facebook/x/snap"
+
+
+def test_falls_back_to_repo_id_before_first_download(monkeypatch):
+    import huggingface_hub
+
+    from src.asr_seamless import _local_snapshot
+
+    monkeypatch.setattr(huggingface_hub, "try_to_load_from_cache", lambda repo, name: None)
+    assert _local_snapshot("facebook/x") == "facebook/x"
