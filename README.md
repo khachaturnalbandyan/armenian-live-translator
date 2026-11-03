@@ -96,8 +96,9 @@ Details and the alternatives that were rejected are in [DECISIONS.md](DECISIONS.
   trained on written Armenian, often translates it wrongly. NLLB can
   mistranslate rare place names ("Գյումրի" -> "Guam").
 - Speaker labels come from voice clustering, so two people with very similar voices can
-  be merged, and a speaker who only ever says one short word starts a new label. Tune
-  with `--speaker-threshold`.
+  be merged. Segments under 1.5 s ("հա", "ախպեր") never start a new label: they go
+  to the closest known speaker, because their voice vector is too noisy (live, they had
+  produced 31 speakers in 3 minutes). Tune with `--speaker-threshold`.
 - Segments from both sources are transcribed by one worker, so if both sides of the call
   speak at length at the same time the GPU queues them and latency grows past what the
   `--stats` numbers show for a single stream.

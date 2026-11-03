@@ -19,6 +19,7 @@ def make_identifier(threshold: float = 0.55) -> SpeakerIdentifier:
     identifier.threshold = threshold
     identifier.sample_rate = 16_000
     identifier.min_samples = int(0.4 * 16_000)
+    identifier.min_new_speaker_samples = int(1.5 * 16_000)
     identifier._sums = []
     identifier._counts = []
     identifier.last_embed_seconds = 0.0
@@ -93,3 +94,35 @@ def test_identical_voice_never_creates_a_second_speaker(threshold: float) -> Non
     voice = unit(0.3, -0.4, 0.5, 0.7)
 
     assert {feed(identifier, voice) for _ in range(5)} == {"Speaker 1"}
+
+
+def test_short_segment_joins_the_closest_speaker_instead_of_a_new_one() -> None:
+    # Live, every short reply ("հա", "ախպեր") became a new speaker: 31 in 3 minutes.
+    identifier = make_identifier()
+    a = unit(1.0, 0.0, 0.0, 0.0)
+    b = unit(0.0, 1.0, 0.0, 0.0)
+    feed(identifier, a)
+    feed(identifier, b)
+
+    label = feed(identifier, unit(0.0, 0.3, 1.0, 0.0), seconds=0.8)  # cosine 0.29 to B, 0 to A
+
+    assert label == "Speaker 2"
+    assert identifier.speaker_count == 2
+
+
+def test_short_segment_does_not_change_the_voice_profile() -> None:
+    identifier = make_identifier()
+    feed(identifier, unit(1.0, 0.0, 0.0, 0.0))
+    before = identifier._sums[0].copy()
+
+    feed(identifier, unit(1.0, 0.5, 0.0, 0.0), seconds=0.8)
+
+    assert np.array_equal(identifier._sums[0], before)
+    assert identifier._counts == [1]
+
+
+def test_short_first_segment_is_not_given_a_speaker() -> None:
+    identifier = make_identifier()
+
+    assert feed(identifier, unit(1.0, 0.0, 0.0, 0.0), seconds=0.8) == "Speaker ?"
+    assert identifier.speaker_count == 0

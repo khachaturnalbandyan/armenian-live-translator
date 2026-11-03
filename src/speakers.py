@@ -32,6 +32,7 @@ class SpeakerIdentifier:
         model_name: str = EMBEDDING_MODEL,
         threshold: float = 0.55,
         min_speech_s: float = 0.4,
+        min_new_speaker_s: float = 1.5,
         device: str = "cpu",
         sample_rate: int = 16_000,
     ):
@@ -47,6 +48,10 @@ class SpeakerIdentifier:
         self.threshold = threshold
         self.sample_rate = sample_rate
         self.min_samples = int(min_speech_s * sample_rate)
+        # Below this a voice vector is too noisy to found a speaker or to refine one:
+        # live, every short reply ("հա", "ախպեր") became a new speaker, 31 in 3 minutes.
+        # Such a segment is given the closest speaker already known.
+        self.min_new_speaker_samples = int(min_new_speaker_s * sample_rate)
         self._sums: list[np.ndarray] = []
         self._counts: list[int] = []
         self.last_embed_seconds = 0.0
@@ -66,12 +71,17 @@ class SpeakerIdentifier:
             # vector that would be mostly noise.
             return "Speaker ?"
 
+        short = len(audio) < self.min_new_speaker_samples
         if not self._sums:
+            if short:
+                return "Speaker ?"
             self._add(vector)
             return self._label(0)
 
         similarities = self._similarities(vector)
         best = int(np.argmax(similarities))
+        if short:
+            return self._label(best)
         if similarities[best] >= self.threshold:
             self._sums[best] = self._sums[best] + vector
             self._counts[best] += 1
