@@ -23,6 +23,11 @@ def test_returns_text_and_audio_length():
     assert not transcript.unclear
 
 
+def test_output_is_cleaned_of_tags_and_dashes():
+    transcript = make_transcriber("- #err Դուք արեցիք։").transcribe(SPEECH)
+    assert transcript.text == "Դուք արեցիք։"
+
+
 def test_word_loop_is_marked_unclear():
     transcript = make_transcriber("այդ այդ այդ այդ").transcribe(SPEECH)
     assert transcript.unclear

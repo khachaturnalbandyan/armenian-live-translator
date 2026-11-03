@@ -86,8 +86,14 @@ Details and the alternatives that were rejected are in [DECISIONS.md](DECISIONS.
 
 ## Known limitations
 
-- Recognition is measured on one speaker and one laptop microphone (0.7% CER normal,
-  2.5% fast); other voices, accents and call audio are not measured yet. NLLB can
+- Recognition is measured on one speaker and one laptop microphone: 2.9% CER through
+  the live segmenter (0.9% normal, 4.9% fast); other voices, accents and call audio are
+  not measured yet. SeamlessM4T's mistakes are fluent words ("շնորհակալ եմ" ->
+  "հիմա այնտեղ եմ"), so they do not look like errors.
+- Short interjections ("հա", "դե", "խո") are glossed from a fixed list (`src/fillers.py`)
+  rather than translated: NLLB turns a lone "հա" into a made-up sentence.
+- Colloquial Yerevan speech ("ոնց ես", "սենց", "ա" for "է") is recognised, but NLLB,
+  trained on written Armenian, often translates it wrongly. NLLB can
   mistranslate rare place names ("Գյումրի" -> "Guam").
 - Speaker labels come from voice clustering, so two people with very similar voices can
   be merged, and a speaker who only ever says one short word starts a new label. Tune

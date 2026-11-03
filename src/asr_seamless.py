@@ -11,7 +11,7 @@ import time
 import numpy as np
 import torch
 
-from src.asr import Transcript, has_word_loop
+from src.asr import Transcript, clean_text, has_word_loop
 
 SEAMLESS_MODEL = "facebook/seamless-m4t-v2-large"
 ARMENIAN = "hye"
@@ -54,7 +54,7 @@ class SeamlessTranscriber:
         if len(audio) == 0:
             return Transcript(text="", audio_seconds=0.0, elapsed=0.0)
 
-        text = self._decode(audio)
+        text = clean_text(self._decode(audio))
         return Transcript(
             text=text,
             audio_seconds=len(audio) / SAMPLE_RATE,

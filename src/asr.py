@@ -17,6 +17,7 @@ DEFAULT_MODEL = "hurricup/whisper-large-v3-turbo-armenian-ct2"
 # in place of a sentence end. Neither is speech, and both end up in the translation.
 DIALOGUE_DASH = "-–—"
 ELLIPSIS = "…"
+DISFLUENCY_TAG = "#"
 
 # Whisper sometimes gets stuck repeating one word ("այդ այդ այդ այդ ..."). The same
 # word this many times in a row is treated as such a loop.
@@ -43,10 +44,19 @@ def has_word_loop(text: str, run: int = LOOP_RUN) -> bool:
 
 
 def clean_text(text: str) -> str:
-    """Drop the subtitle marks: a leading dialogue dash and every "…"."""
-    text = text.replace(ELLIPSIS, " ")
-    text = text.strip().lstrip(DIALOGUE_DASH).strip()
-    return " ".join(text.split())
+    """Drop what is not speech: dialogue dashes, "…" and disfluency tags.
+
+    The dashes and "…" come from the Whisper fine-tune; SeamlessM4T writes hesitations
+    as tags ("#err", "#hmm") and also opens each line of a dialogue with "- ".
+    """
+    words = text.replace(ELLIPSIS, " ").split()
+    words = [word for word in words if not word.startswith(DISFLUENCY_TAG)]
+    words = [word for word in words if word.strip(DIALOGUE_DASH)]
+    if words:
+        words[0] = words[0].lstrip(DIALOGUE_DASH)
+    text = " ".join(words)
+    # Whatever is left once the tags are gone may be bare punctuation ("#err ։").
+    return text if any(ch.isalnum() for ch in text) else ""
 
 
 class Transcriber:

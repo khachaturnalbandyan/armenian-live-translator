@@ -23,6 +23,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
+from src.pipeline import READ_CHUNK  # noqa: E402
 from src.segmenter import Segmenter  # noqa: E402
 from tools.asr_backends import load_backend, release  # noqa: E402
 from tools.scoring import SAMPLE_RATE, EvalItem, cer, load_manifest, load_wav, percentile, wer  # noqa: E402
@@ -62,8 +63,13 @@ class BackendResult:
 def pieces_of(audio, segment: bool) -> list:
     if not segment:
         return [audio]
+    # Fed in the live program's read size: segment edges move with the chunking, and
+    # a 30 ms shift is enough to change what SeamlessM4T hears.
     segmenter = Segmenter()
-    return [s.audio for s in segmenter.push(audio) + segmenter.flush()]
+    segments = []
+    for start in range(0, len(audio), READ_CHUNK):
+        segments += segmenter.push(audio[start : start + READ_CHUNK])
+    return [s.audio for s in segments + segmenter.flush()]
 
 
 def run_backend(spec: str, items: list[EvalItem], segment: bool) -> BackendResult:

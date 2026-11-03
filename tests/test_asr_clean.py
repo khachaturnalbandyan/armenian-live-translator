@@ -24,5 +24,22 @@ def test_keeps_hyphen_inside_text():
     assert clean_text("Երևան-Գյումրի ճանապարհը") == "Երևան-Գյումրի ճանապարհը"
 
 
+def test_removes_dialogue_dash_between_sentences():
+    raw = "- Դուք արեցիք։ - Շնորհակալություն։"
+    assert clean_text(raw) == "Դուք արեցիք։ Շնորհակալություն։"
+
+
+@pytest.mark.parametrize(
+    ("raw", "expected"),
+    [
+        ("#err երկու վեկտորներին ուղղահայաց։", "երկու վեկտորներին ուղղահայաց։"),
+        ("#hmm #enhnm", ""),
+        ("#err ։", ""),
+    ],
+)
+def test_removes_disfluency_tags(raw, expected):
+    assert clean_text(raw) == expected
+
+
 def test_dash_only_becomes_empty():
     assert clean_text("- …") == ""

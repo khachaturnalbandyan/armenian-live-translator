@@ -75,6 +75,13 @@ including translation. The only wrong English was NLLB turning "Գյումրի" 
 By the same lines, the previous live test with the Whisper turbo turned this kind of
 sentence into nonsense.
 
+Fed through the live segmenter in the live read size (`compare_asr.py --segment`,
+`eval/results-real-live.md`, 2026-11-03), the 40 recordings give CER 2.9% for Seamless
+(0.9% normal, 4.9% fast) and 6.9% for the turbo. Earlier `--segment` numbers pushed the
+whole file at once; segment edges then differ by tens of milliseconds, and that alone
+changed one Seamless transcript ("շնորհակալ եմ" -> "հիմա այնտեղ եմ"). Its errors are
+fluent substitutions like that one, which read as correct text.
+
 Made the default on that evidence. Trade-offs:
 - License CC-BY-NC-4.0, non-commercial use only. Fine for this challenge; a commercial
   build would use `--asr whisper` (Apache-2.0).

@@ -17,11 +17,20 @@ from dataclasses import dataclass
 from .asr import Transcriber
 from .capture import CaptureError, EndOfStream
 from .display import Printer
+from .fillers import filler_translation
 from .segmenter import Segment, Segmenter
 from .speakers import SpeakerIdentifier
 from .translate import Translator
 
 READ_CHUNK = 4096  # 256 ms at 16 kHz: frequent enough for low end-to-end latency
+# A looped transcript can run to a hundred words; this many are enough to show what
+# it was without flooding the terminal.
+UNCLEAR_PREVIEW_WORDS = 6
+
+
+def unclear_preview(text: str, words: int = UNCLEAR_PREVIEW_WORDS) -> str:
+    parts = text.split()
+    return " ".join(parts[:words]) + (" …" if len(parts) > words else "")
 
 
 @dataclass
@@ -143,7 +152,9 @@ class Pipeline:
         if transcript.unclear:
             # A looped transcript translates into "this this this ..."; say it is
             # unusable instead of presenting it as what was said.
-            armenian, english = f"[unclear] {transcript.text}", "[unclear]"
+            armenian, english = f"[unclear] {unclear_preview(transcript.text)}", "[unclear]"
+        elif (filler := filler_translation(transcript.text)) is not None:
+            english = filler  # NLLB turns a lone "հա" into a made-up sentence
         elif self.translator is not None:
             english, translate_time = self.translator.translate(transcript.text)
 
