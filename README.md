@@ -30,16 +30,18 @@ keeping the same label for the same person for the whole session.
 
 ## Setup
 
-Requirements: Linux with PipeWire or PulseAudio (`pactl`, `parec`), Python 3.10+,
-ffmpeg, and a CUDA GPU (CPU works with `--cpu`, slower).
+Requirements: Linux with PipeWire or PulseAudio (`pactl`, `parec`), Python 3.12
+(tested; newer versions are not checked against every dependency), ffmpeg, and a CUDA
+GPU (CPU works with `--cpu`, slower).
 
 ```bash
-python3 -m venv --system-site-packages .venv
-.venv/bin/pip install -r requirements.txt
+uv venv --python 3.12 .venv                      # uv fetches Python 3.12 if the system has another
+uv pip install --python .venv -r requirements.txt
 ```
 
-`--system-site-packages` reuses an existing PyTorch install; without it, `pip` pulls in
-its own torch wheel (a few GB). First run downloads the models: SeamlessM4T v2 large
+Without uv, `python3.12 -m venv .venv && .venv/bin/pip install -r requirements.txt`
+does the same. Ubuntu 26.04 ships only Python 3.14, which is why uv is the default here.
+The install pulls in its own torch wheel (a few GB). First run downloads the models: SeamlessM4T v2 large
 (~9 GB) and NLLB-200 600M (~2.4 GB); `--asr whisper` adds the Armenian Whisper turbo (~1.6 GB). They are cached afterwards and the program works
 offline.
 
@@ -70,7 +72,9 @@ On PipeWire/PulseAudio every playback device has a `.monitor` source, so the cal
 is captured like any other input — the user still hears it normally. `--system-audio`
 with no argument picks the monitor of the current default output; to choose another,
 take its name from `--list-devices` and pass it as `--system-audio <name>`. No virtual
-driver (BlackHole, Soundflower) is needed on Linux.
+driver (BlackHole, Soundflower) is needed on Linux. With a Bluetooth headset the call plays through
+`bluez_output.<address>.monitor`. Device names can change after an OS upgrade, so take
+them from `--list-devices` rather than from an old command.
 
 ## Models and why
 

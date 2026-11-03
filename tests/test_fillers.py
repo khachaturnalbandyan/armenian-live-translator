@@ -63,8 +63,34 @@ def test_repeated_interjection_is_glossed_not_marked_unclear():
     pipeline._retries = pipeline._unclear = 0
     pipeline._latencies, pipeline._counts = [], {}
 
-    segment = SimpleNamespace(audio=None, t_finalized=0.0, start=0.0)
+    segment = SimpleNamespace(audio=None, t_finalized=0.0, start=0.0, end=1.0)
     pipeline._handle(segment, SimpleNamespace(speaker="Me"))
 
     assert printed[0]["armenian"] == "Դե, դե, դե։"
     assert printed[0]["english"] == "well, well, well"
+
+
+def test_line_is_stamped_with_the_end_of_speech():
+    # Lines appear when a phrase ends; stamped with its start, a long phrase from the
+    # call looked out of order next to a short one from the mic that ended earlier.
+    from types import SimpleNamespace
+
+    from src.asr import Transcript
+    from src.pipeline import Pipeline
+
+    printed = []
+    pipeline = Pipeline.__new__(Pipeline)
+    pipeline.transcriber = SimpleNamespace(transcribe=lambda audio: Transcript("Բարև", 1.0, 0.1))
+    pipeline.translator = SimpleNamespace(translate=lambda text: ("Hello", 0.0))
+    pipeline.printer = SimpleNamespace(segment=lambda **line: printed.append(line))
+    pipeline.identifier = None
+    pipeline.recorder = None
+    pipeline.show_stats = False
+    pipeline._started_at = 100.0
+    pipeline._retries = pipeline._unclear = 0
+    pipeline._latencies, pipeline._counts = [], {}
+
+    segment = SimpleNamespace(audio=None, t_finalized=0.0, start=1.0, end=6.5)
+    pipeline._handle(segment, SimpleNamespace(speaker="Speaker 1"))
+
+    assert printed[0]["timestamp"] == 106.5

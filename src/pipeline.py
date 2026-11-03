@@ -176,7 +176,9 @@ class Pipeline:
             )
         self.printer.segment(
             started_at=self._started_at,
-            timestamp=self._started_at + segment.start,
+            # End of speech, not start: lines appear as phrases end, so a long phrase
+            # from one side would otherwise look out of order next to the other side.
+            timestamp=self._started_at + segment.end,
             speaker=speaker,
             armenian=armenian,
             english=english,
