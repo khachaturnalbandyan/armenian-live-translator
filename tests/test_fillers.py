@@ -15,6 +15,10 @@ from src.fillers import filler_translation
         ("հա՞", "yeah"),
         ("դե հա", "well, yeah"),
         ("խո։", ""),
+        ("հմմ", "hmm"),
+        ("հաաա", "yeah"),
+        ("ըըը", "uh"),
+        ("մմմմ", "mm"),
     ],
 )
 def test_known_interjections_get_a_fixed_gloss(armenian, english):

@@ -7,6 +7,8 @@ gets the gloss below instead of going to the translator.
 
 from __future__ import annotations
 
+import re
+
 # "" means the word carries no meaning of its own in English (a particle).
 FILLERS = {
     "հա": "yeah",
@@ -37,9 +39,23 @@ def _words(text: str) -> list[str]:
     return [word for word in words if word]
 
 
+def _collapse(word: str, keep: int) -> str:
+    """Shorten every run of one letter to `keep` letters: "հմմմ" -> "հմմ" / "հմ"."""
+    return re.sub(r"(.)\1+", lambda run: run.group(1) * keep, word)
+
+
+def _gloss(word: str) -> str | None:
+    # Hesitations are written with the sound held ("հմմ", "հաաա", "ըըը"), so a word
+    # also matches with its repeated letters shortened to two, then to one.
+    for form in (word, _collapse(word, 2), _collapse(word, 1)):
+        if form in FILLERS:
+            return FILLERS[form]
+    return None
+
+
 def filler_translation(text: str) -> str | None:
     """The English for a segment made only of interjections, else None."""
-    words = _words(text)
-    if not words or any(word not in FILLERS for word in words):
+    glosses = [_gloss(word) for word in _words(text)]
+    if not glosses or None in glosses:
         return None
-    return ", ".join(gloss for gloss in (FILLERS[word] for word in words) if gloss)
+    return ", ".join(gloss for gloss in glosses if gloss)
