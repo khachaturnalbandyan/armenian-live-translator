@@ -31,6 +31,10 @@ FILLERS = {
     "վայ": "oh",
     "խո": "",
     "բա": "",
+    # Colloquial words NLLB does not know ("ախպեր" came out as "The scalp").
+    "ախպեր": "bro",
+    "ապեր": "bro",
+    "հլը": "hold on",
 }
 
 

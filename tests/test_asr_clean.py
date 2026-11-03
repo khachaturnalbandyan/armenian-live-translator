@@ -35,6 +35,9 @@ def test_removes_dialogue_dash_between_sentences():
         ("#err երկու վեկտորներին ուղղահայաց։", "երկու վեկտորներին ուղղահայաց։"),
         ("#hmm #enhnm", ""),
         ("#err ։", ""),
+        ("** մենք", "մենք"),
+        ("** ինչ-որ ծրագրերի ։", "ինչ-որ ծրագրերի ։"),
+        ("**մենք**", "մենք"),
     ],
 )
 def test_removes_disfluency_tags(raw, expected):

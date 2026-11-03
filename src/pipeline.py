@@ -145,16 +145,17 @@ class Pipeline:
         if not transcript.text:
             return
         self._retries += transcript.retried
-        self._unclear += transcript.unclear
 
         armenian = transcript.text
         english, translate_time = "", 0.0
-        if transcript.unclear:
+        # Interjections first: "դե, դե, դե" is how people talk, not a decoding loop.
+        if (filler := filler_translation(transcript.text)) is not None:
+            english = filler  # NLLB turns a lone "հա" into a made-up sentence
+        elif transcript.unclear:
             # A looped transcript translates into "this this this ..."; say it is
             # unusable instead of presenting it as what was said.
+            self._unclear += 1
             armenian, english = f"[unclear] {unclear_preview(transcript.text)}", "[unclear]"
-        elif (filler := filler_translation(transcript.text)) is not None:
-            english = filler  # NLLB turns a lone "հա" into a made-up sentence
         elif self.translator is not None:
             english, translate_time = self.translator.translate(transcript.text)
 

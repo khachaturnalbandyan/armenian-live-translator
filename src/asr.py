@@ -18,6 +18,7 @@ DEFAULT_MODEL = "hurricup/whisper-large-v3-turbo-armenian-ct2"
 DIALOGUE_DASH = "-–—"
 ELLIPSIS = "…"
 DISFLUENCY_TAG = "#"
+MARKDOWN_BOLD = "*"
 
 # Whisper sometimes gets stuck repeating one word ("այդ այդ այդ այդ ..."). The same
 # word this many times in a row is treated as such a loop.
@@ -47,10 +48,13 @@ def clean_text(text: str) -> str:
     """Drop what is not speech: dialogue dashes, "…" and disfluency tags.
 
     The dashes and "…" come from the Whisper fine-tune; SeamlessM4T writes hesitations
-    as tags ("#err", "#hmm") and also opens each line of a dialogue with "- ".
+    as tags ("#err", "#hmm"), sometimes opens a line with Markdown "**", and opens each
+    line of a dialogue with "- ".
     """
     words = text.replace(ELLIPSIS, " ").split()
     words = [word for word in words if not word.startswith(DISFLUENCY_TAG)]
+    words = [word.strip(MARKDOWN_BOLD) for word in words]
+    words = [word for word in words if word]
     words = [word for word in words if word.strip(DIALOGUE_DASH)]
     if words:
         words[0] = words[0].lstrip(DIALOGUE_DASH)
