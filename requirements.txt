@@ -13,6 +13,6 @@ pyannote.audio==4.0.7
 # run.sh puts them on LD_LIBRARY_PATH.
 nvidia-cublas-cu12
 nvidia-cudnn-cu12
-# Evaluation only (tools/compare_asr.py): SeamlessM4T ships a SentencePiece tokenizer.
+# --asr seamless and tools/compare_asr.py: SeamlessM4T ships a SentencePiece tokenizer.
 # Without it transformers fails with a misleading "tiktoken is required" error.
 sentencepiece==0.2.2

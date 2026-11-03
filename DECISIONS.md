@@ -4,9 +4,15 @@ Short log of choices that were not obvious, with the reason they were made.
 Numbers come from `tools/eval_offline.py` on the synthetic Armenian set in `eval/audio`
 (5 phrases, Piper `hy_AM-gor-medium`), CUDA float16 on an RTX 4060 Laptop.
 
-## D1 - Speech recognition: Armenian fine-tune of Whisper large-v3-turbo
+## D1 - Speech recognition: SeamlessM4T v2, Armenian Whisper turbo as fallback
 
-Updated 2026-10-30. The default is now `hurricup/whisper-large-v3-turbo-armenian-ct2`
+Updated 2026-11-03: the default is SeamlessM4T v2 large (`--asr seamless`), chosen on
+real recordings; see "Real recordings" below. `--asr whisper` runs the Apache-2.0 model
+described next, which was the default from 2026-10-30 to 2026-11-03.
+
+### Armenian fine-tune of Whisper large-v3-turbo (`--asr whisper`)
+
+Since 2026-10-30 `--asr whisper` uses `hurricup/whisper-large-v3-turbo-armenian-ct2`
 (Apache-2.0, already in CTranslate2 format, so it runs in the same faster-whisper code).
 Measured with `tools/compare_asr.py`; full output in `eval/results-synthetic.md`.
 
@@ -46,6 +52,34 @@ scope by rule.
 
 Rejected on evidence: `large-v3-turbo`. Revisit if the real-recording eval shows the
 gap closes.
+
+### Real recordings: SeamlessM4T becomes the default (2026-10-30, 2026-11-03)
+
+20 sentences, one speaker, laptop microphone; full output in `eval/results-real.md`.
+
+| CER | normal | fast | joined 10-16 s, normal | joined 10-16 s, fast |
+| --- | --- | --- | --- | --- |
+| `seamless-m4t-v2-large` | **0.7%** | **2.5%** | **0.7%** | **2.3%** |
+| Armenian turbo (`--asr whisper`) | 2.6% | 8.2% | 2.4% | 6.5% |
+| w2v-BERT | 2.4% | 6.0% | - | - |
+| `large-v3` | 13.1% | 13.2% | - | - |
+
+`src/asr_seamless.py`; about 4.6 GB of GPU memory together with NLLB.
+
+The risk was that it replaces unusual phrases with common ones, as it did on the
+synthetic set. A live test on 2026-11-03 with 12 hard sentences (court, hospital,
+Amsterdam, AI terms, prices, a date and time, a phone number, questions, two long fast
+sentences) did not show it: 9 of 12 came out word for word, the other 3 differed in one
+word form (e.g. "գտնվում է" -> "գտնվող") with the meaning kept. 0.25-0.97 s per line
+including translation. The only wrong English was NLLB turning "Գյումրի" into "Guam".
+By the same lines, the previous live test with the Whisper turbo turned this kind of
+sentence into nonsense.
+
+Made the default on that evidence. Trade-offs:
+- License CC-BY-NC-4.0, non-commercial use only. Fine for this challenge; a commercial
+  build would use `--asr whisper` (Apache-2.0).
+- Still one speaker, one microphone, no call audio. The live test was compared by text
+  only (live audio is not saved).
 
 ## D2 - Translation: NLLB-200-distilled-600M, greedy decoding
 

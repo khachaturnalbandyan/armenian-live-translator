@@ -12,6 +12,7 @@ os.environ.setdefault("HF_HUB_DISABLE_PROGRESS_BARS", "1")
 os.environ.setdefault("TRANSFORMERS_VERBOSITY", "error")
 
 from src.asr import DEFAULT_MODEL, Transcriber
+from src.asr_seamless import SeamlessTranscriber
 from src.capture import (
     CaptureError,
     ParecCapture,
@@ -57,7 +58,14 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="cosine similarity above which a segment belongs to a known speaker (default: 0.55)",
     )
     parser.add_argument(
-        "--model", default=DEFAULT_MODEL, help=f"faster-whisper model (default: {DEFAULT_MODEL})"
+        "--asr",
+        choices=["whisper", "seamless"],
+        default="seamless",
+        help="speech recogniser: seamless (default, SeamlessM4T v2, non-commercial license) "
+        "or whisper (Armenian Whisper turbo, Apache-2.0)",
+    )
+    parser.add_argument(
+        "--model", default=DEFAULT_MODEL, help=f"faster-whisper model for --asr whisper (default: {DEFAULT_MODEL})"
     )
     parser.add_argument("--compute-type", default="float16", help="CTranslate2 compute type")
     parser.add_argument("--cpu", action="store_true", help="run on CPU instead of CUDA")
@@ -181,9 +189,12 @@ def main(argv: list[str] | None = None) -> int:
             identifier = SpeakerIdentifier(threshold=args.speaker_threshold)
 
         print(f"Loading models on {run_device} (this takes a few seconds)...", flush=True)
-        transcriber = Transcriber(
-            model_name=args.model, device=run_device, compute_type=compute_type
-        )
+        if args.asr == "seamless":
+            transcriber = SeamlessTranscriber(device=run_device)
+        else:
+            transcriber = Transcriber(
+                model_name=args.model, device=run_device, compute_type=compute_type
+            )
         translator = None if args.no_translate else Translator(args.mt_model, device=run_device)
     except Exception as exc:
         print(f"error loading models: {exc}", file=sys.stderr)

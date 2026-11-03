@@ -1,0 +1,282 @@
+[
+  {
+    "file": "xachatur_mic_001.wav",
+    "reference": "Բարև, ինչպե՞ս ես։",
+    "speaker": "xachatur",
+    "source": "mic",
+    "seconds": 5.9
+  },
+  {
+    "file": "xachatur_mic_002.wav",
+    "reference": "Ես լավ եմ, շնորհակալություն, իսկ դո՞ւ։",
+    "speaker": "xachatur",
+    "source": "mic",
+    "seconds": 4.1
+  },
+  {
+    "file": "xachatur_mic_003.wav",
+    "reference": "Վաղը ժամը տասին հանդիպում ունենք։",
+    "speaker": "xachatur",
+    "source": "mic",
+    "seconds": 4.0
+  },
+  {
+    "file": "xachatur_mic_004.wav",
+    "reference": "Կարո՞ղ ես կրկնել, լավ չլսեցի։",
+    "speaker": "xachatur",
+    "source": "mic",
+    "seconds": 3.2
+  },
+  {
+    "file": "xachatur_mic_005.wav",
+    "reference": "Այս շաբաթ շատ աշխատանք ունեմ։",
+    "speaker": "xachatur",
+    "source": "mic",
+    "seconds": 3.7
+  },
+  {
+    "file": "xachatur_mic_006.wav",
+    "reference": "Երևանում այսօր շատ շոգ է։",
+    "speaker": "xachatur",
+    "source": "mic",
+    "seconds": 2.9
+  },
+  {
+    "file": "xachatur_mic_007.wav",
+    "reference": "Մենք պետք է ավարտենք նախագիծը մինչև ուրբաթ։",
+    "speaker": "xachatur",
+    "source": "mic",
+    "seconds": 3.8
+  },
+  {
+    "file": "xachatur_mic_008.wav",
+    "reference": "Ո՞վ է պատասխանատու այս հարցի համար։",
+    "speaker": "xachatur",
+    "source": "mic",
+    "seconds": 3.4
+  },
+  {
+    "file": "xachatur_mic_009.wav",
+    "reference": "Ես համաձայն չեմ, կարծում եմ՝ կա ավելի լավ տարբերակ։",
+    "speaker": "xachatur",
+    "source": "mic",
+    "seconds": 4.2
+  },
+  {
+    "file": "xachatur_mic_010.wav",
+    "reference": "Զանգիր ինձ, երբ տուն հասնես։",
+    "speaker": "xachatur",
+    "source": "mic",
+    "seconds": 2.7
+  },
+  {
+    "file": "xachatur_mic_011.wav",
+    "reference": "Գինը հազար հինգ հարյուր դրամ է։",
+    "speaker": "xachatur",
+    "source": "mic",
+    "seconds": 3.2
+  },
+  {
+    "file": "xachatur_mic_012.wav",
+    "reference": "Արամը և Անին երեկ գնացին Գյումրի։",
+    "speaker": "xachatur",
+    "source": "mic",
+    "seconds": 3.9
+  },
+  {
+    "file": "xachatur_mic_013.wav",
+    "reference": "Ինտերնետը նորից դանդաղ է աշխատում։",
+    "speaker": "xachatur",
+    "source": "mic",
+    "seconds": 3.2
+  },
+  {
+    "file": "xachatur_mic_014.wav",
+    "reference": "Խնդրում եմ, ուղարկիր ինձ այդ ֆայլը։",
+    "speaker": "xachatur",
+    "source": "mic",
+    "seconds": 3.4
+  },
+  {
+    "file": "xachatur_mic_015.wav",
+    "reference": "Մենք օգտագործում ենք արհեստական բանականություն թարգմանության համար։",
+    "speaker": "xachatur",
+    "source": "mic",
+    "seconds": 5.4
+  },
+  {
+    "file": "xachatur_mic_016.wav",
+    "reference": "Ներողություն, ուշացա, խցանում էր։",
+    "speaker": "xachatur",
+    "source": "mic",
+    "seconds": 4.1
+  },
+  {
+    "file": "xachatur_mic_017.wav",
+    "reference": "Ի՞նչ ես կարծում, սա կաշխատի՞։",
+    "speaker": "xachatur",
+    "source": "mic",
+    "seconds": 3.2
+  },
+  {
+    "file": "xachatur_mic_018.wav",
+    "reference": "Հաջորդ ամիս պատրաստվում եմ մեկնել Թբիլիսի։",
+    "speaker": "xachatur",
+    "source": "mic",
+    "seconds": 3.6
+  },
+  {
+    "file": "xachatur_mic_019.wav",
+    "reference": "Այո, ամեն ինչ պարզ է, շնորհակալ եմ։",
+    "speaker": "xachatur",
+    "source": "mic",
+    "seconds": 3.7
+  },
+  {
+    "file": "xachatur_mic_020.wav",
+    "reference": "Լավ, ուրեմն մինչև վաղը, հաջողություն։",
+    "speaker": "xachatur",
+    "source": "mic",
+    "seconds": 3.5
+  },
+  {
+    "file": "xachatur-fast_mic_021.wav",
+    "reference": "Բարև, ինչպե՞ս ես։",
+    "speaker": "xachatur-fast",
+    "source": "mic",
+    "seconds": 2.3
+  },
+  {
+    "file": "xachatur-fast_mic_022.wav",
+    "reference": "Ես լավ եմ, շնորհակալություն, իսկ դո՞ւ։",
+    "speaker": "xachatur-fast",
+    "source": "mic",
+    "seconds": 2.7
+  },
+  {
+    "file": "xachatur-fast_mic_023.wav",
+    "reference": "Վաղը ժամը տասին հանդիպում ունենք։",
+    "speaker": "xachatur-fast",
+    "source": "mic",
+    "seconds": 2.7
+  },
+  {
+    "file": "xachatur-fast_mic_024.wav",
+    "reference": "Կարո՞ղ ես կրկնել, լավ չլսեցի։",
+    "speaker": "xachatur-fast",
+    "source": "mic",
+    "seconds": 2.6
+  },
+  {
+    "file": "xachatur-fast_mic_025.wav",
+    "reference": "Այս շաբաթ շատ աշխատանք ունեմ։",
+    "speaker": "xachatur-fast",
+    "source": "mic",
+    "seconds": 2.2
+  },
+  {
+    "file": "xachatur-fast_mic_026.wav",
+    "reference": "Երևանում այսօր շատ շոգ է։",
+    "speaker": "xachatur-fast",
+    "source": "mic",
+    "seconds": 2.2
+  },
+  {
+    "file": "xachatur-fast_mic_027.wav",
+    "reference": "Մենք պետք է ավարտենք նախագիծը մինչև ուրբաթ։",
+    "speaker": "xachatur-fast",
+    "source": "mic",
+    "seconds": 3.0
+  },
+  {
+    "file": "xachatur-fast_mic_028.wav",
+    "reference": "Ո՞վ է պատասխանատու այս հարցի համար։",
+    "speaker": "xachatur-fast",
+    "source": "mic",
+    "seconds": 2.5
+  },
+  {
+    "file": "xachatur-fast_mic_029.wav",
+    "reference": "Ես համաձայն չեմ, կարծում եմ՝ կա ավելի լավ տարբերակ։",
+    "speaker": "xachatur-fast",
+    "source": "mic",
+    "seconds": 3.7
+  },
+  {
+    "file": "xachatur-fast_mic_030.wav",
+    "reference": "Զանգիր ինձ, երբ տուն հասնես։",
+    "speaker": "xachatur-fast",
+    "source": "mic",
+    "seconds": 2.4
+  },
+  {
+    "file": "xachatur-fast_mic_031.wav",
+    "reference": "Գինը հազար հինգ հարյուր դրամ է։",
+    "speaker": "xachatur-fast",
+    "source": "mic",
+    "seconds": 2.7
+  },
+  {
+    "file": "xachatur-fast_mic_032.wav",
+    "reference": "Արամը և Անին երեկ գնացին Գյումրի։",
+    "speaker": "xachatur-fast",
+    "source": "mic",
+    "seconds": 3.7
+  },
+  {
+    "file": "xachatur-fast_mic_033.wav",
+    "reference": "Ինտերնետը նորից դանդաղ է աշխատում։",
+    "speaker": "xachatur-fast",
+    "source": "mic",
+    "seconds": 2.8
+  },
+  {
+    "file": "xachatur-fast_mic_034.wav",
+    "reference": "Խնդրում եմ, ուղարկիր ինձ այդ ֆայլը։",
+    "speaker": "xachatur-fast",
+    "source": "mic",
+    "seconds": 2.6
+  },
+  {
+    "file": "xachatur-fast_mic_035.wav",
+    "reference": "Մենք օգտագործում ենք արհեստական բանականություն թարգմանության համար։",
+    "speaker": "xachatur-fast",
+    "source": "mic",
+    "seconds": 4.6
+  },
+  {
+    "file": "xachatur-fast_mic_036.wav",
+    "reference": "Ներողություն, ուշացա, խցանում էր։",
+    "speaker": "xachatur-fast",
+    "source": "mic",
+    "seconds": 2.9
+  },
+  {
+    "file": "xachatur-fast_mic_037.wav",
+    "reference": "Ի՞նչ ես կարծում, սա կաշխատի՞։",
+    "speaker": "xachatur-fast",
+    "source": "mic",
+    "seconds": 2.5
+  },
+  {
+    "file": "xachatur-fast_mic_038.wav",
+    "reference": "Հաջորդ ամիս պատրաստվում եմ մեկնել Թբիլիսի։",
+    "speaker": "xachatur-fast",
+    "source": "mic",
+    "seconds": 3.1
+  },
+  {
+    "file": "xachatur-fast_mic_039.wav",
+    "reference": "Այո, ամեն ինչ պարզ է, շնորհակալ եմ։",
+    "speaker": "xachatur-fast",
+    "source": "mic",
+    "seconds": 3.2
+  },
+  {
+    "file": "xachatur-fast_mic_040.wav",
+    "reference": "Լավ, ուրեմն մինչև վաղը, հաջողություն։",
+    "speaker": "xachatur-fast",
+    "source": "mic",
+    "seconds": 2.6
+  }
+]

@@ -27,6 +27,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from src.asr import Transcriber  # noqa: E402
+from src.asr_seamless import SeamlessTranscriber  # noqa: E402
 
 SAMPLE_RATE = 16_000
 
@@ -133,34 +134,16 @@ class CtcBackend:
 
 
 class SeamlessBackend:
-    """Meta SeamlessM4T v2, used here for Armenian speech -> Armenian text."""
-
-    LANGUAGE = "hye"
+    """The live program's SeamlessTranscriber, so its numbers match what the app does."""
 
     def __init__(self, model: str):
-        from transformers import AutoProcessor, SeamlessM4Tv2ForSpeechToText
-
-        self._device = _device()
-        self._processor = AutoProcessor.from_pretrained(model)
-        self._model = (
-            SeamlessM4Tv2ForSpeechToText.from_pretrained(model, dtype=_dtype(self._device))
-            .to(self._device)
-            .eval()
-        )
+        self._transcriber = SeamlessTranscriber(model_name=model, device=_device())
 
     def transcribe(self, audio: np.ndarray) -> str:
-        inputs = self._processor(audio=audio, sampling_rate=SAMPLE_RATE, return_tensors="pt")
-        features = inputs["input_features"].to(self._device, dtype=self._model.dtype)
-        with torch.inference_mode():
-            ids = self._model.generate(
-                input_features=features,
-                attention_mask=inputs["attention_mask"].to(self._device),
-                tgt_lang=self.LANGUAGE,
-            )
-        return self._processor.decode(ids[0], skip_special_tokens=True).strip()
+        return self._transcriber.transcribe(audio).text
 
     def close(self) -> None:
-        del self._model
+        del self._transcriber
 
 
 BACKENDS = {

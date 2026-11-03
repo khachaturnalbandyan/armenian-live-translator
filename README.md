@@ -18,7 +18,7 @@ checked with real speech.
 
 ```
 microphone ─┐                    ┌── Silero VAD ──> phrases ──> speaker ID ──> faster-whisper ──> NLLB ──> terminal
-            ├─ 16 kHz mono ──────┤                                  (embeddings)  (Armenian turbo)   (hy→en)
+            ├─ 16 kHz mono ──────┤                                  (embeddings)  (SeamlessM4T v2)   (hy→en)
 system out ─┘                    └── each source has its own VAD and capture thread
 ```
 
@@ -39,8 +39,8 @@ python3 -m venv --system-site-packages .venv
 ```
 
 `--system-site-packages` reuses an existing PyTorch install; without it, `pip` pulls in
-its own torch wheel (a few GB). First run downloads the models: the Armenian Whisper
-turbo (~1.6 GB) and NLLB-200 600M (~2.4 GB). They are cached afterwards and the program works
+its own torch wheel (a few GB). First run downloads the models: SeamlessM4T v2 large
+(~9 GB) and NLLB-200 600M (~2.4 GB); `--asr whisper` adds the Armenian Whisper turbo (~1.6 GB). They are cached afterwards and the program works
 offline.
 
 ## Running
@@ -76,7 +76,8 @@ driver (BlackHole, Soundflower) is needed on Linux.
 
 | Stage | Choice | Why |
 | --- | --- | --- |
-| ASR | faster-whisper `hurricup/whisper-large-v3-turbo-armenian-ct2` (Whisper large-v3-turbo fine-tuned on Armenian), CUDA float16 | Best of five local recognisers measured: 6.0% CER vs 13.5% for stock `large-v3`, 7.9% vs 18.7% on speech sped up 1.6x, 0.33 s per phrase. Stock `large-v3` is still available with `--model large-v3` (see `DECISIONS.md`, D1) |
+| ASR | SeamlessM4T v2 large (`--asr seamless`, default), CUDA float16 | Lowest CER of five local recognisers on real recordings: 0.7% normal, 2.5% fast, vs 2.6% and 8.2% for the Armenian Whisper turbo and 13.1% for stock `large-v3`; handled hard live sentences (terms, numbers, names) correctly at 0.3-1.0 s per line. **License CC-BY-NC-4.0 (non-commercial)** |
+| ASR, fallback | faster-whisper `hurricup/whisper-large-v3-turbo-armenian-ct2` (`--asr whisper`) | Apache-2.0 alternative for commercial use; stock Whisper with `--asr whisper --model large-v3`. See `DECISIONS.md`, D1 |
 | Translation | NLLB-200 distilled 600M, greedy | Trained on Armenian→English directly, 0.1–0.45 s per phrase |
 | VAD | Silero (bundled with faster-whisper) | Reliable on short phrases, cheap on CPU |
 | Speaker ID | pyannote `wespeaker-voxceleb-resnet34-LM` embeddings + online clustering | The embedding model behind the pyannote 3.1 pipeline, run per segment and clustered as the call goes on: 0.03–0.07 s per segment on CPU, no GPU contention, and it works streaming, which the offline 3.1 pipeline cannot. The embedding model is not gated, so no Hugging Face token is needed |
@@ -85,8 +86,9 @@ Details and the alternatives that were rejected are in [DECISIONS.md](DECISIONS.
 
 ## Known limitations
 
-- Armenian ASR is the weak link: 13% character error rate on the synthetic eval set;
-  expect proper nouns and fast speech to be worse. Real-recording numbers are pending.
+- Recognition is measured on one speaker and one laptop microphone (0.7% CER normal,
+  2.5% fast); other voices, accents and call audio are not measured yet. NLLB can
+  mistranslate rare place names ("Գյումրի" -> "Guam").
 - Speaker labels come from voice clustering, so two people with very similar voices can
   be merged, and a speaker who only ever says one short word starts a new label. Tune
   with `--speaker-threshold`.
