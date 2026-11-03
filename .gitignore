@@ -14,3 +14,6 @@ recordings/
 *.safetensors
 *.pt
 
+
+# Challenge brief documents are not part of the repo.
+*.docx
