@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import os
 import sys
+import time
 
 # Keep the terminal clean: model downloads and transformers chatter are noise next
 # to the transcript.
@@ -22,6 +23,7 @@ from src.capture import (
 )
 from src.display import Printer
 from src.pipeline import Pipeline, Source
+from src.recorder import SegmentRecorder
 from src.segmenter import Segmenter
 from src.speakers import SpeakerIdentifier
 from src.translate import Translator
@@ -82,6 +84,14 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--threshold", type=float, default=0.5, help="VAD speech threshold")
     parser.add_argument("--stats", action="store_true", help="print timing next to each line")
     parser.add_argument("--output", help="optional file path to save live transcripts")
+    parser.add_argument(
+        "--save-audio",
+        nargs="?",
+        const="",
+        metavar="DIR",
+        help="keep every segment as a WAV plus session.jsonl, for evaluation "
+        "(default DIR: recordings/<date-time>, git-ignored)",
+    )
     return parser.parse_args(argv)
 
 
@@ -200,6 +210,14 @@ def main(argv: list[str] | None = None) -> int:
         print(f"error loading models: {exc}", file=sys.stderr)
         return 1
 
+    recorder = None
+    if args.save_audio is not None:
+        directory = args.save_audio or os.path.join(
+            "recordings", time.strftime("%Y-%m-%d_%H-%M-%S")
+        )
+        recorder = SegmentRecorder(directory)
+        print(f"Saving segments to {directory}/", flush=True)
+
     pipeline = Pipeline(
         sources=sources,
         transcriber=transcriber,
@@ -207,6 +225,7 @@ def main(argv: list[str] | None = None) -> int:
         printer=Printer(output_file=args.output),
         identifier=identifier,
         show_stats=args.stats,
+        recorder=recorder,
     )
 
     print("Listening:\n  " + "\n  ".join(where), flush=True)

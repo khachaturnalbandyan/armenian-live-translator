@@ -15,6 +15,7 @@ FILLERS = {
     "հաա": "yeah",
     "այո": "yes",
     "չէ": "no",
+    "չե": "no",
     "ոչ": "no",
     "դե": "well",
     "հը": "huh",
@@ -25,6 +26,7 @@ FILLERS = {
     "ըը": "uh",
     "մմ": "mm",
     "հմ": "hmm",
+    "հըմ": "hmm",
     "ահ": "ah",
     "ախ": "ah",
     "օհ": "oh",
@@ -35,6 +37,7 @@ FILLERS = {
     "ախպեր": "bro",
     "ապեր": "bro",
     "հլը": "hold on",
+    "հաջ": "bye",
 }
 
 
@@ -55,6 +58,12 @@ def _gloss(word: str) -> str | None:
         if form in FILLERS:
             return FILLERS[form]
     return None
+
+
+def is_filler(word: str) -> bool:
+    """True for one interjection, ignoring punctuation and case ("Հա՛" -> True)."""
+    words = _words(word)
+    return len(words) == 1 and _gloss(words[0]) is not None
 
 
 def filler_translation(text: str) -> str | None:

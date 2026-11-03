@@ -48,7 +48,7 @@ def test_loop_is_detected_despite_punctuation_and_case(text):
 
 @pytest.mark.parametrize(
     "text",
-    ["Բարև, ինչպե՞ս ես։", "շատ շատ լավ է", "", "այդ, այդ"],
+    ["Բարև, ինչպե՞ս ես։", "շատ շատ լավ է", "", "այդ, այդ", "հա, հա, հա, բայց սա էլ", "դե դե դե"],
 )
 def test_normal_speech_and_double_words_are_not_loops(text):
     assert not has_word_loop(text)

@@ -22,6 +22,9 @@ from src.fillers import filler_translation
         ("Դե, դե, դե։", "well, well, well"),
         ("ախպեր,", "bro"),
         ("հլը։", "hold on"),
+        ("հըմ", "hmm"),
+        ("չե։", "no"),
+        ("Հաջ։", "bye"),
     ],
 )
 def test_known_interjections_get_a_fixed_gloss(armenian, english):
@@ -54,6 +57,7 @@ def test_repeated_interjection_is_glossed_not_marked_unclear():
     pipeline.translator = SimpleNamespace(translate=lambda text: ("should not be used", 0.0))
     pipeline.printer = SimpleNamespace(segment=lambda **line: printed.append(line))
     pipeline.identifier = None
+    pipeline.recorder = None
     pipeline.show_stats = False
     pipeline._started_at = 0.0
     pipeline._retries = pipeline._unclear = 0

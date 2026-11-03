@@ -8,6 +8,8 @@ from dataclasses import dataclass
 import numpy as np
 from faster_whisper import WhisperModel
 
+from .fillers import is_filler
+
 # Whisper large-v3-turbo fine-tuned on Armenian, already converted for faster-whisper.
 # On the synthetic eval set: CER 6.0% vs 13.5% for stock large-v3, 7.9% vs 18.7% on
 # speech sped up 1.6x, and about twice as fast. See DECISIONS.md (D1).
@@ -38,10 +40,16 @@ class Transcript:
 
 
 def has_word_loop(text: str, run: int = LOOP_RUN) -> bool:
-    """True if one word repeats `run` or more times in a row, ignoring punctuation."""
+    """True if one word repeats `run` or more times in a row, ignoring punctuation.
+
+    Interjections do not count: people really say "հա, հա, հա" and "դե դե դե".
+    """
     words = ["".join(ch for ch in word if ch.isalnum()).lower() for word in text.split()]
     words = [word for word in words if word]
-    return any(len(set(words[i : i + run])) == 1 for i in range(len(words) - run + 1))
+    return any(
+        len(set(words[i : i + run])) == 1 and not is_filler(words[i])
+        for i in range(len(words) - run + 1)
+    )
 
 
 def clean_text(text: str) -> str:

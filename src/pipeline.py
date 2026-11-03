@@ -18,6 +18,7 @@ from .asr import Transcriber
 from .capture import CaptureError, EndOfStream
 from .display import Printer
 from .fillers import filler_translation
+from .recorder import SegmentRecorder
 from .segmenter import Segment, Segmenter
 from .speakers import SpeakerIdentifier
 from .translate import Translator
@@ -52,8 +53,10 @@ class Pipeline:
         printer: Printer,
         identifier: SpeakerIdentifier | None = None,
         show_stats: bool = False,
+        recorder: SegmentRecorder | None = None,
     ):
         self.sources = sources
+        self.recorder = recorder
         self.transcriber = transcriber
         self.translator = translator
         self.printer = printer
@@ -179,6 +182,15 @@ class Pipeline:
             english=english,
             stats=stats,
         )
+        if self.recorder is not None:
+            self.recorder.save(
+                segment.audio,
+                source=source.label,
+                speaker=speaker,
+                at=segment.start,
+                armenian=armenian,
+                english=english,
+            )
 
     def _print_summary(self) -> None:
         if not self._latencies:
