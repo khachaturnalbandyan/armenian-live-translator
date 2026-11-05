@@ -23,7 +23,7 @@ interview; update the status column instead of trusting memory.
 | # | Check | Target | Status |
 | --- | --- | --- | --- |
 | P1 | End of phrase → English line | ≤ 5 s | ✅ p50 0.93 s, max 1.12 s with speaker ID on (realtime, `--stats`) |
-| P2 | No segment over the budget over a 10-minute session | 0 | 🟡 10-min two-stream replay (2026-11-05): 286 lines, p50 0.40 s, p95 1.70 s; one recognition call stalled for 16 s and the 2 lines queued behind it also went over 5 s. The same segment re-runs in 0.4 s, so the stall was outside the model; cause not found |
+| P2 | No segment over the budget over a 10-minute session | 0 | 🟡 10-min two-stream replay, two runs (2026-11-05). Run 2: 286 lines, p50 0.36 s, p95 0.64 s, max 2.74 s, 0 over 5 s. Run 1: one recognition call stalled for 16 s and the 2 lines queued behind it went over 5 s; the segment re-runs in 0.4 s. Swap grew from 1.7 to ~4 GB during the runs (14 GB RAM), the likely cause |
 | P3 | ASR + MT alone per phrase | ≤ 2 s | ✅ p50 0.90 s |
 
 Measuring latency: run with `--stats`; every line prints ASR/MT time and latency from
