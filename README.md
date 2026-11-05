@@ -23,7 +23,7 @@ system out ─┘                    └── each source has its own VAD and c
 ```
 
 Each source runs in its own thread so audio keeps flowing while the recogniser works.
-Segments close on a 350 ms pause rather than on a fixed window, which is what keeps the
+Segments close on a 500 ms pause rather than on a fixed window, which is what keeps the
 latency budget: the clock starts when the phrase ends. The microphone is labelled `Me`;
 voices on the system-audio stream are clustered online and labelled `Speaker 1..N`,
 keeping the same label for the same person for the whole session.
@@ -112,7 +112,10 @@ Details and the alternatives that were rejected are in [DECISIONS.md](DECISIONS.
   decoded once more with repeats blocked (about +1 s); if it still loops it is shown as
   `[unclear]` rather than translated. Blocking repeats on every segment would avoid the
   retry but raised CER from 13.5% to 16.0%, so it is used only after a loop.
-- Long monologues are hard-cut at 6 s, which can split a sentence mid-word.
+- The 6 s cap (`--max-segment-s`) is checked on silent frames only, so it splits long
+  phrases at a short pause but never mid-word. Someone who talks without any pause gets
+  one long segment, shown once they stop; SeamlessM4T handled 10–16 s of joined real
+  speech at 2.3% CER, so accuracy holds, but that line appears later.
 - Linux/PipeWire only for live capture; macOS would need a different capture backend
   (`capture.py` is the single place to change).
 - The 5 s budget assumes a CUDA GPU; on CPU the recogniser will exceed it.
