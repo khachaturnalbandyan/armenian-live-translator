@@ -48,7 +48,6 @@ offline.
 ## Running
 
 ```bash
-```bash
 ./run.sh --list-devices          # microphones and system-audio (monitor) sources
 ./run.sh                         # system default microphone only
 ./run.sh --system-audio          # microphone + monitor of the default output
