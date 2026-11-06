@@ -103,10 +103,11 @@ for a 5 s budget).
 ## D3 - Segmentation: Silero VAD endpointing, not fixed windows
 
 Latency must be measured from the end of the phrase, so the program cannot wait for a
-fixed-size window to fill. Segments close after 350 ms of silence (configurable), which
-costs 0.35 s of the budget and keeps phrases intact. Whisper is also given 200 ms of
-padding around the cut audio: cutting exactly at the VAD boundary truncates consonants
-and measurably hurts the transcript.
+fixed-size window to fill. Segments close after 500 ms of silence (`--min-silence-ms`),
+which costs 0.5 s of the budget and keeps phrases intact. It is a trade-off: a shorter
+pause prints lines sooner, a longer one keeps a sentence in one line. The recogniser is
+also given 200 ms of audio before the detected start and 250 ms after the end: cutting
+exactly at the VAD boundary truncates consonants and measurably hurts the transcript.
 
 ## D4 - Capture: PipeWire `.monitor` sources instead of a virtual loopback driver
 
